@@ -1,0 +1,146 @@
+﻿@page "/barchart"
+@using ApexCharts
+
+<div class="p-6 bg-gray-100 min-h-screen">
+
+    <!-- Title -->
+    <p class="text-center text-gray-700 text-lg mb-4">
+        Top 3 wards showing the lowest to highest levels of PM2.5
+    </p>
+
+    <!-- Legend -->
+    <div class="flex justify-center mb-3 gap-6">
+        <span class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 bg-green-400 inline-block rounded-sm"></span> Best Areas
+        </span>
+
+        <span class="flex items-center gap-2 text-sm text-gray-600">
+            <span class="w-3 h-3 bg-red-400 inline-block rounded-sm"></span> Worst Areas
+        </span>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="bg-white p-4 rounded-xl shadow mx-auto w-[720px] h-[400px] overflow-visible">
+
+        <ApexChart TItem="ChartData"
+                   @ref="chart"
+                   Options="options">
+
+           <ApexCharts.ApexPointSeries TItem="ChartData"
+                             Items="data"
+                             Name="PM2.5"
+                             SeriesType="SeriesType.Bar"
+                             XValue="@(e => e.Area)"
+                             YValue="@(e => e.Value)" />
+
+        </ApexChart>
+
+    </div>
+
+</div>
+
+@code {
+
+    private ApexChart<ChartData>? chart;
+    private List<ChartData> data = new();
+    private ApexChartOptions<ChartData> options = new();
+
+    protected override void OnInitialized()
+    {
+        data =
+        [
+            new() { Area = "Panchawati_Pashan (Best_1)", Value = 31.09m },
+            new() { Area = "Bhosari (Best_2)", Value = 33.4m },
+            new() { Area = "Transport Nagar-Nigdi (Best_3)", Value = 35.36m },
+
+            new() { Area = "Hadapsar (Worst_10)", Value = 57.56m },
+            new() { Area = "Bhumkar Nagar (Worst_11)", Value = 58.77m },
+            new() { Area = "MIT-Kothrud (Worst_12)", Value = 61.62m }
+        ];
+
+        options = new()
+        {
+            Chart = new()
+            {
+                Type = ChartType.Bar,
+                Toolbar = new() { Show = false }
+            },
+
+            PlotOptions = new()
+            {
+                Bar = new()
+                {
+                    Horizontal = false,
+                    ColumnWidth = "45%",
+                    Distributed = true
+                }
+            },
+
+            DataLabels = new()
+            {
+                Enabled = false
+            },
+
+            // ✅ FIX: prevent label cut
+            Xaxis = new()
+            {
+                Labels = new()
+                {
+                    Show = true,
+                    Rotate = -45,
+                    RotateAlways = true,
+                    Trim = false,
+                    Style = new()
+                    {
+                        FontSize = "11px"
+                    }
+                },
+                TickPlacement = TickPlacement.On
+            },
+
+            Yaxis =
+            [
+                new()
+                {
+                    Title = new()
+                    {
+                        Text = "Average PM2.5"
+                    }
+                }
+            ],
+
+            Grid = new()
+            {
+                Padding = new()
+                {
+                    Bottom = 20
+                }
+            },
+
+            // ✅ Best (green) vs Worst (red)
+            Colors =
+            [
+                "#22C55E", "#4ADE80", "#86EFAC",
+                "#F87171", "#EF4444", "#B91C1C"
+            ]
+        };
+    }
+
+    private async Task ShowHorizontal()
+    {
+        options.PlotOptions.Bar.Horizontal = true;
+        await chart!.UpdateOptionsAsync(true, true, true);
+    }
+
+    private async Task ShowVertical()
+    {
+        options.PlotOptions.Bar.Horizontal = false;
+        await chart!.UpdateOptionsAsync(true, true, true);
+    }
+
+    public class ChartData
+    {
+        public string Area { get; set; } = string.Empty;
+        public decimal? Value { get; set; }
+    }
+}

@@ -1,0 +1,129 @@
+﻿@page "/linechart"
+@using ApexCharts
+
+<div class="min-h-screen bg-gray-100 p-6">
+
+    <!-- PAGE TITLE -->
+    <div class="mb-4">
+        <h1 class="text-xl font-semibold text-gray-800">
+            PM2.5 Trends (2024 - 2026)
+        </h1>
+    </div>
+
+    <!-- CHART CARD -->
+    <div class="bg-white rounded-xl shadow p-6 max-w-4xl mx-auto">
+
+        <!-- SUB TITLE -->
+        <div class="text-center mb-1">
+            <p class="text-gray-700 font-medium">
+                PM2.5 across all wards in Pune
+            </p>
+        </div>
+
+        <!-- LIMIT TEXT -->
+        <div class="text-center text-xs text-gray-500 mb-4">
+            NAAQS Allowable Limit (PM2.5)
+        </div>
+
+        <div class="flex">
+
+            <!-- VERTICAL LABEL -->
+            <div class="flex items-center justify-center pr-3">
+                <div class="transform -rotate-90 whitespace-nowrap text-gray-600 font-medium">
+                    Monthly Average PM2.5
+                </div>
+            </div>
+
+            <!-- CHART + LINE -->
+            <div class="flex-1 relative">
+
+                <!-- 🔥 FAKE LIMIT LINE (40 VALUE POSITION) -->
+                <!-- Adjust 'top' % based on your data range -->
+                <div class="absolute left-4 right-0 border-t-2 border-black"
+                     style="top: 49%;"
+                     title="NAAQS Allowable Limit (PM2.5)">
+                </div>
+
+                <ApexChart TItem="DataPoint" Height="320">
+
+                    <!-- 2024 -->
+                    <ApexCharts.ApexPointSeries TItem="DataPoint"
+                                     Items="Data2024"
+                                     Name="2024"
+                                     SeriesType="SeriesType.Line"
+                                     XValue="e => e.Month"
+                                     YValue="e => e.Value"
+                                     Color="#2563eb" />
+
+                    <!-- 2025 -->
+                    <ApexCharts.ApexPointSeries TItem="DataPoint"
+                                     Items="Data2025"
+                                     Name="2025"
+                                     SeriesType="SeriesType.Line"
+                                     XValue="e => e.Month"
+                                     YValue="e => e.Value"
+                                     Color="#f97316" />
+
+                    <!-- 2026 -->
+                    <ApexCharts.ApexPointSeries TItem="DataPoint"
+                                     Items="Data2026"
+                                     Name="2026"
+                                     SeriesType="SeriesType.Line"
+                                     XValue="e => e.Month"
+                                     YValue="e => e.Value"
+                                     Color="#22c55e" />
+
+                </ApexChart>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public class DataPoint
+    {
+        public string Month { get; set; } = string.Empty;
+        public decimal Value { get; set; }
+    }
+
+    List<DataPoint> Data2024 = new()
+    {
+        new() { Month = "Jan", Value = 62.8m },
+        new() { Month = "Feb", Value = 60.6m },
+        new() { Month = "Mar", Value = 51.26m },
+        new() { Month = "Apr", Value = 45.44m },
+        new() { Month = "May", Value = 38.67m },
+        new() { Month = "Jun", Value = 22.72m },
+        new() { Month = "Jul", Value = 17.51m },
+        new() { Month = "Aug", Value = 22.75m },
+        new() { Month = "Sep", Value = 20.79m },
+        new() { Month = "Oct", Value = 33.82m },
+        new() { Month = "Nov", Value = 57.99m },
+        new() { Month = "Dec", Value = 51.29m }
+    };
+
+    List<DataPoint> Data2025 = new()
+    {
+        new() { Month = "Jan", Value = 60.55m },
+        new() { Month = "Feb", Value = 56.2m },
+        new() { Month = "Mar", Value = 49.66m },
+        new() { Month = "Apr", Value = 38.87m },
+        new() { Month = "May", Value = 29.56m },
+        new() { Month = "Jun", Value = 27.65m },
+        new() { Month = "Jul", Value = 25.12m },
+        new() { Month = "Aug", Value = 24.21m },
+        new() { Month = "Sep", Value = 26.03m },
+        new() { Month = "Oct", Value = 39.7m },
+        new() { Month = "Nov", Value = 60.27m },
+        new() { Month = "Dec", Value = 90.35m }
+    };
+
+    List<DataPoint> Data2026 = new()
+    {
+        new() { Month = "Jan", Value = 73.94m },
+        new() { Month = "Feb", Value = 71.2m },
+        new() { Month = "Mar", Value = 47.23m }
+    };
+}
