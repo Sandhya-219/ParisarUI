@@ -1,0 +1,77 @@
+﻿@page "/map"
+@using LeafletForBlazor
+@using System.Security.Claims
+@inject IJSRuntime JSRuntime
+
+ 
+<PageTitle>Bin Map</PageTitle>
+ 
+<div class="mx-auto">
+    <RealTimeMap Parameters="parameters" height="calc(100vh - 6rem)" width="calc(100vw - 18rem)"></RealTimeMap>
+</div>
+
+@code {
+    RealTimeMap.LoadParameters parameters = new RealTimeMap.LoadParameters()  //general map settings
+    {
+        location = new RealTimeMap.Location()
+        {
+            latitude = 44.4501715,
+            longitude = 26.1107672,
+        },
+        zoomLevel = 18
+    };
+}
+ 
+@* @code
+{
+    private List<Registartion> registartions = new();
+    private string _userId;
+    public async Task onAfterMapLoaded(RealTimeMap.MapEventArgs args)
+    {
+ 
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        _userId = user.Identity?.Name;
+        var fullAccessRoles = RoleSettings.Value.FullAccessRoles;
+        if (user.Identity.IsAuthenticated)
+        {
+            if (fullAccessRoles.Any(role => user.Claims.Any(c =>
+            c.Type == ClaimTypes.Role && string.Equals(c.Value, role, StringComparison.OrdinalIgnoreCase))))
+            {
+                registartions = _context.Registartion
+                .Where(x=>x.Latitude != null && x.Longitude != null)
+                .ToList();  
+            } 
+            else 
+            {
+                var assignedRegistrationIds = await _context.userRegistrations
+                   .Where(x => x.UserName == _userId)
+                   .Select(x => x.RegisterId)
+                   .ToListAsync();
+                   registartions = _context.Registartion.Where(x => assignedRegistrationIds.Contains(x.Id) && x.Latitude != null && x.Longitude != null).ToList();
+            }
+        }        
+        var realTimeMap = args.sender as RealTimeMap;
+ 
+        realTimeMap.Geometric.Points.Appearance().pattern = new RealTimeMap.PointTooltip()
+            {
+                content = "${value}"
+            };
+ 
+        realTimeMap.Geometric.Points.Appearance().pattern = new RealTimeMap.PointSymbol()
+            {
+                fillColor = "#8D77AB",
+                radius = 8
+            };
+        // Upload BinRegistration details to the map
+        await realTimeMap.Geometric.Points.upload(
+         registartions.Select(registration => new RealTimeMap.StreamPoint
+             {
+                 guid = Guid.NewGuid(),
+                 latitude = (double)(registration?.Latitude ?? 0.0),
+                 longitude = (double)(registration?.Longitude ?? 0.0),
+                 value = $"<b>Society Name: </b>{registration.SocietyName}</br><b>Phone Number: </b>{registration.MobileNumber}</br><b>Entity Type: </b>{Helper.GetEnumDisplayName(registration.EntityType)}"
+             }).ToList()
+         );
+    }
+} *@

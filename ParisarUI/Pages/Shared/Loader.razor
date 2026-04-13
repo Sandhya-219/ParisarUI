@@ -1,0 +1,35 @@
+﻿@if (Visible)
+{
+    <div class="fixed inset-0 flex items-center justify-center bg-gray-100/80 z-50">
+
+        <div class="flex flex-col items-center gap-4">
+
+            <!-- LOADER -->
+            <div class="relative @GetSize()">
+                <div class="absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin"></div>
+                <div class="absolute inset-2 rounded-full border-4 border-yellow-400 border-b-transparent animate-spin [animation-duration:1.5s]"></div>
+                <div class="absolute inset-4 rounded-full border-4 border-red-400 border-l-transparent animate-spin [animation-duration:2s]"></div>
+            </div>
+
+            <!-- TEXT -->
+            <p class="text-sm font-semibold text-gray-700 animate-pulse text-center">
+                @Text
+            </p>
+
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; } = true;
+    [Parameter] public string Text { get; set; } = "Loading...";
+    [Parameter] public string Size { get; set; } = "md"; // sm | md | lg
+
+    private string GetSize() => Size switch
+    {
+        "sm" => "w-12 h-12",
+        "lg" => "w-28 h-28",
+        _ => "w-20 h-20"
+    };
+}

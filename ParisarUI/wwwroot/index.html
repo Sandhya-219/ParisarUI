@@ -11,23 +11,59 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="ParisarUI.styles.css" rel="stylesheet" />
+    <style>
+        @keyframes pulse-slow {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 2s infinite;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+    <!-- LOADER -->
+    <div id="loader" class="fixed inset-0 flex items-center justify-center bg-gray-100 z-50">
+
+        <div class="flex flex-col items-center gap-6">
+
+            <!-- Rings -->
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin"></div>
+                <div class="absolute inset-2 rounded-full border-4 border-yellow-400 border-b-transparent animate-spin [animation-duration:1.5s]"></div>
+                <div class="absolute inset-4 rounded-full border-4 border-red-400 border-l-transparent animate-spin [animation-duration:2s]"></div>
+            </div>
+
+            <!-- Text -->
+            <p class="text-sm font-semibold text-gray-700 animate-pulse">
+                Loading Air Quality Data...
+            </p>
+
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
+    <!-- BLAZOR APP -->
+    <div id="app"></div>
+
     <script src="_framework/blazor.webassembly.js"></script>
+
+    <!-- REMOVE LOADER -->
+    <script>
+        window.addEventListener("load", () => {
+            const loader = document.getElementById("loader");
+            if (loader) {
+                loader.style.display = "none";
+            }
+        });
+    </script>
+
 </body>
 
 </html>
