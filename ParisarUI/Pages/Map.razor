@@ -3,10 +3,85 @@
 @using System.Security.Claims
 @inject IJSRuntime JSRuntime
 
+<PageTitle>Map</PageTitle>
+
+<RealTimeMap Height="460px"
+             Width="100%"
+             Parameters="parameters"
+             OnAfterMapLoaded="OnAfterMapLoaded">
+</RealTimeMap>
+
+@code {
+
+    public class DataPoints
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string Name { get; set; }
+        public string Color { get; set; }
+    }
+
+    public List<DataPoints> Points = new()
+    {
+        new DataPoints { Name = "Kothrud", Latitude = 18.520509, Longitude = 73.818319 , Color = "#623e8c" },
+        new DataPoints { Name = "Bhumkar Nagar", Latitude = 18.600147, Longitude = 73.748596, Color = "#45738a" },
+        new DataPoints { Name = "GaneshKhind", Latitude = 18.557806, Longitude = 73.819969, Color = "#a1931a" },
+        new DataPoints { Name = "Hinjawadi", Latitude = 18.587722, Longitude = 73.735544, Color = "#a1501a" },
+        new DataPoints { Name = "Range Hills", Latitude = 18.556885, Longitude = 73.835020, Color = "#db4040" }
+    };
+
+    RealTimeMap.LoadParameters parameters = new()
+    {
+        location = new RealTimeMap.Location()
+        {
+            latitude = 18.5204,
+            longitude = 73.8567
+        },
+        zoomLevel = 12
+    };
+
+    public async Task OnAfterMapLoaded(RealTimeMap.MapEventArgs args)
+    {
+        var map = args.sender as RealTimeMap;
+
+        // Tooltip
+        map.Geometric.Points.Appearance().pattern = new RealTimeMap.PointTooltip()
+        {
+            content = "${value}"
+        };
+
+        // Marker style
+        map.Geometric.Points.Appearance().pattern = new RealTimeMap.PointSymbol()
+        {
+            fillColor = "#623e8c",
+            radius = 8
+        };
+
+        // Upload points
+        await map.Geometric.Points.upload(
+            Points.Select(p => new RealTimeMap.StreamPoint
+            {
+                guid = Guid.NewGuid(),
+                latitude = p.Latitude,
+                longitude = p.Longitude,
+                value = $"<b>Location:</b> {p.Name}"
+            }).ToList()
+        );
+    }
+}
+
+
  
-<PageTitle>Bin Map</PageTitle>
- 
-<div class="mx-auto">
+
+@* <p>NA<sup>+</sup> Not Available</p>
+<p>0-30 Good</p>
+<p>30-60 Satisfactory</p>
+<p>60-90 Moderate</p>
+<p>90-120 Poor</p>
+<p>120-150 Very Poor</p>
+<p>250+ Severe</p> *@
+
+@* <div class="mx-auto">
     <RealTimeMap Parameters="parameters" height="calc(100vh - 6rem)" width="calc(100vw - 18rem)"></RealTimeMap>
 </div>
 
@@ -20,7 +95,7 @@
         },
         zoomLevel = 18
     };
-}
+} *@
  
 @* @code
 {

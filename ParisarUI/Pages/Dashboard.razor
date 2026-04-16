@@ -3,11 +3,12 @@
 @using ApexCharts
 @using ParisarUI.Dashboard
 @using ParisarUI.Pages.Shared
+@using ParisarUI.Pages
 
 <div class="bg-gray-100 min-h-screen p-4">
    
       
-       <!-- 🔷 FILTER SECTION -->
+    <!-- 🔷 FILTER SECTION -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border mb-4">
         <h2 class="text-sm font-semibold mb-3 text-gray-700">Filters</h2>
 
@@ -48,6 +49,15 @@
             Text="Loading Air Quality Data..."
             Size="md" />
 
+    <!--Select Location Name-->
+    @if (!string.IsNullOrEmpty(selectedLocationName))
+    {
+        <div class="mb-3">
+            <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-medium">
+                📍 @selectedLocationName
+            </span>
+        </div>
+    }
     <!-- 🔷 STATS -->
     @if (stats != null)
     {
@@ -137,6 +147,16 @@
         </div>
 
     </div>
+    
+<!--Map-->
+<div class="bg-white p-4 rounded-2xl shadow border mt-4">
+     <!-- ✅ MAP INSIDE DIV -->
+        <div class="mt-4 h-[450px] rounded-xl overflow-hidden border shadow-inner relative z-0">
+            <Map />
+        </div>
+
+</div>
+
 </div>
 
 @* <!-- 🔷 FLOATING PM TOGGLE (BUBBLE STYLE) -->
@@ -173,7 +193,7 @@
 </div> *@
 
 <!-- 🔷 PREMIUM FLOATING TOGGLE (TEAL THEME) -->
-<div class="fixed bottom-6 right-6 z-50 group">
+<div class="fixed bottom-10 right-6 z-[9999] group drop-shadow-2xl">
 
     <!-- TOOLTIP -->
     <div class="absolute bottom-20 right-1/2 translate-x-1/2
@@ -190,8 +210,8 @@
         hover:scale-110 active:scale-95
         animate-pulse-slow
         @(isPm10
-                         ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-300/50"
-                         : "bg-gradient-to-br from-teal-400 to-emerald-600 text-white shadow-teal-300/50")">
+                                     ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-300/50"
+                                     : "bg-gradient-to-br from-teal-400 to-emerald-600 text-white shadow-teal-300/50")">
 
         <!-- ICON -->
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -211,6 +231,8 @@
     </button>
 
 </div>
+
+
 
 @code {
 
@@ -242,17 +264,170 @@
 
     private void LoadStats()
     {
-        selectedLocationName = "ALANDI";
-        stats = new LocationStats
+        // 🔷 ALANDI (default)
+        if (selectedOption == "1")
         {
-            TotalDays = 834,
-            DataAvailableDays = 311,
-            Rank = 5,
-            TotalLocations = 12,
-            ExceedDays = 92,
-            ExceedPercent = 30
-        };
+            selectedLocationName = "ALANDI";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 311,
+                Rank = 5,
+                TotalLocations = 12,
+                ExceedDays = 92,
+                ExceedPercent = 30
+            };
+        }
+        // 🔷 BHOSARI
+        else if (selectedOption == "2")
+        {
+            selectedLocationName = "BHOSARI";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 487,
+                Rank = 3,
+                TotalLocations = 12,
+                ExceedDays = 61,
+                ExceedPercent = 13
+            };
+        }
+        // 🔷 BHUMKAR NAGAR
+        else if (selectedOption == "3")
+        {
+            selectedLocationName = "BHUMKAR NAGAR";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 512,
+                Rank = 12,
+                TotalLocations = 12,
+                ExceedDays = 253,
+                ExceedPercent = 49
+            };
+        }
+        // HADAPSAR
+        else if (selectedOption == "4")
+        {
+            selectedLocationName = "HADAPSAR";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 444,
+                Rank = 9,
+                TotalLocations = 12,
+                ExceedDays = 193,
+                ExceedPercent = 43
+            };
+        }
+        //DHANKAWADI
+        else if (selectedOption == "5")
+        {
+            selectedLocationName = "DHANKAWADI";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 184,
+                Rank = 10,
+                TotalLocations = 12,
+                ExceedDays = 76,
+                ExceedPercent = 41
+            };
+        }
+        //MIT-KOTHRUD
+        else if (selectedOption == "6")
+        {
+            selectedLocationName = "MIT-KOTHRUD";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 74,
+                Rank = 11,
+                TotalLocations = 12,
+                ExceedDays = 50,
+                ExceedPercent = 68
+            };
+        }
+        //MHADA COLONY
+        else if (selectedOption == "7")
+        {
+            selectedLocationName = "MHADA COLONY";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 758,
+                Rank = 4,
+                TotalLocations = 12,
+                ExceedDays = 190,
+                ExceedPercent = 25
+            };
+        }
+        //TRANSPORT NAGAR-NIGDI
+        else if (selectedOption == "8")
+        {
+            selectedLocationName = "TRANSPORT NAGAR-NIGDI";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 735,
+                Rank = 2,
+                TotalLocations = 12,
+                ExceedDays = 107,
+                ExceedPercent = 15
+            };
+        }
+        //PANCHAWATI-PASHAN
+        else if (selectedOption == "9")
+        {
+            selectedLocationName = "PANCHAWATI-PASHAN";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 620,
+                Rank = 1,
+                TotalLocations = 12,
+                ExceedDays = 59,
+                ExceedPercent = 10
+            };
+        }
+        //SAVTA MALI NAGAR
+        else if (selectedOption == "10")
+        {
+            selectedLocationName = "SAVTA MALI NAGAR";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 303,
+                Rank = 7,
+                TotalLocations = 12,
+                ExceedDays = 128,
+                ExceedPercent = 42
+            };
+        }
+        //REVENUE COLONY-SHIVAJI NAGAR
+        else if (selectedOption == "11")
+        {
+            selectedLocationName = "REVENUE COLONY-SHIVAJI NAGAR";
+            stats = new LocationStats
+            {
+                TotalDays = 834,
+                DataAvailableDays = 723,
+                Rank = 6,
+                TotalLocations = 12,
+                ExceedDays = 233,
+                ExceedPercent = 32
+            };
+        }
+        // 🔷 DEFAULT (if nothing selected)
+        else
+        {
+            stats = null;
+        }
+
+        chartKey++; // 🔥 refresh charts
     }
+
+
 
     public class LocationStats
     {
