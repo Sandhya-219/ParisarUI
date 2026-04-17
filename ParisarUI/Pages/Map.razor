@@ -1,7 +1,6 @@
 ﻿@page "/map"
 @using LeafletForBlazor
-@using System.Security.Claims
-@inject IJSRuntime JSRuntime
+@using ParisarUI.DTO
 
 <PageTitle>Map</PageTitle>
 
@@ -13,22 +12,10 @@
 
 @code {
 
-    public class DataPoints
-    {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public string Name { get; set; }
-        public string Color { get; set; }
-    }
+    [Parameter] public List<Location> Locations { get; set; } = new();
+    [Parameter] public bool IsPm10 { get; set; }
 
-    public List<DataPoints> Points = new()
-    {
-        new DataPoints { Name = "Kothrud", Latitude = 18.520509, Longitude = 73.818319 , Color = "#623e8c" },
-        new DataPoints { Name = "Bhumkar Nagar", Latitude = 18.600147, Longitude = 73.748596, Color = "#45738a" },
-        new DataPoints { Name = "GaneshKhind", Latitude = 18.557806, Longitude = 73.819969, Color = "#a1931a" },
-        new DataPoints { Name = "Hinjawadi", Latitude = 18.587722, Longitude = 73.735544, Color = "#a1501a" },
-        new DataPoints { Name = "Range Hills", Latitude = 18.556885, Longitude = 73.835020, Color = "#db4040" }
-    };
+    private RealTimeMap mapRef;
 
     RealTimeMap.LoadParameters parameters = new()
     {
@@ -40,113 +27,54 @@
         zoomLevel = 12
     };
 
+    // 🔥 Runs once
     public async Task OnAfterMapLoaded(RealTimeMap.MapEventArgs args)
     {
-        var map = args.sender as RealTimeMap;
+        mapRef = args.sender as RealTimeMap;
 
-        // Tooltip
-        map.Geometric.Points.Appearance().pattern = new RealTimeMap.PointTooltip()
+        mapRef.Geometric.Points.Appearance().pattern = new RealTimeMap.PointTooltip()
         {
             content = "${value}"
         };
 
-        // Marker style
-        map.Geometric.Points.Appearance().pattern = new RealTimeMap.PointSymbol()
-        {
-            fillColor = "#623e8c",
-            radius = 8
-        };
+        await LoadMarkers();
+    }
 
-        // Upload points
-        await map.Geometric.Points.upload(
-            Points.Select(p => new RealTimeMap.StreamPoint
+    // 🔥 Runs on toggle change
+    protected override async Task OnParametersSetAsync()
+    {
+        if (mapRef != null)
+        {
+            await LoadMarkers();
+        }
+    }
+
+    // 🔥 Reload markers (no clear support → re-upload only once safely)
+    private async Task LoadMarkers()
+    {
+        if (Locations == null || !Locations.Any()) return;
+
+        var points = Locations.Select(loc =>
+        {
+            var pmValue = GetPMValue(loc);
+
+            return new RealTimeMap.StreamPoint
             {
                 guid = Guid.NewGuid(),
-                latitude = p.Latitude,
-                longitude = p.Longitude,
-                value = $"<b>Location:</b> {p.Name}"
-            }).ToList()
-        );
+                latitude = loc.Latitude,
+                longitude = loc.Longitude,
+                value = $"<b>{loc.Name}</b><br/>PM: {pmValue}"
+            };
+        }).ToList();
+
+        await mapRef.Geometric.Points.upload(points);
+    }
+
+    // 🔥 TEMP PM values
+    private double GetPMValue(Location loc)
+    {
+        return IsPm10
+            ? new Random().Next(50, 300)
+            : new Random().Next(20, 150);
     }
 }
-
-
- 
-
-@* <p>NA<sup>+</sup> Not Available</p>
-<p>0-30 Good</p>
-<p>30-60 Satisfactory</p>
-<p>60-90 Moderate</p>
-<p>90-120 Poor</p>
-<p>120-150 Very Poor</p>
-<p>250+ Severe</p> *@
-
-@* <div class="mx-auto">
-    <RealTimeMap Parameters="parameters" height="calc(100vh - 6rem)" width="calc(100vw - 18rem)"></RealTimeMap>
-</div>
-
-@code {
-    RealTimeMap.LoadParameters parameters = new RealTimeMap.LoadParameters()  //general map settings
-    {
-        location = new RealTimeMap.Location()
-        {
-            latitude = 44.4501715,
-            longitude = 26.1107672,
-        },
-        zoomLevel = 18
-    };
-} *@
- 
-@* @code
-{
-    private List<Registartion> registartions = new();
-    private string _userId;
-    public async Task onAfterMapLoaded(RealTimeMap.MapEventArgs args)
-    {
- 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        _userId = user.Identity?.Name;
-        var fullAccessRoles = RoleSettings.Value.FullAccessRoles;
-        if (user.Identity.IsAuthenticated)
-        {
-            if (fullAccessRoles.Any(role => user.Claims.Any(c =>
-            c.Type == ClaimTypes.Role && string.Equals(c.Value, role, StringComparison.OrdinalIgnoreCase))))
-            {
-                registartions = _context.Registartion
-                .Where(x=>x.Latitude != null && x.Longitude != null)
-                .ToList();  
-            } 
-            else 
-            {
-                var assignedRegistrationIds = await _context.userRegistrations
-                   .Where(x => x.UserName == _userId)
-                   .Select(x => x.RegisterId)
-                   .ToListAsync();
-                   registartions = _context.Registartion.Where(x => assignedRegistrationIds.Contains(x.Id) && x.Latitude != null && x.Longitude != null).ToList();
-            }
-        }        
-        var realTimeMap = args.sender as RealTimeMap;
- 
-        realTimeMap.Geometric.Points.Appearance().pattern = new RealTimeMap.PointTooltip()
-            {
-                content = "${value}"
-            };
- 
-        realTimeMap.Geometric.Points.Appearance().pattern = new RealTimeMap.PointSymbol()
-            {
-                fillColor = "#8D77AB",
-                radius = 8
-            };
-        // Upload BinRegistration details to the map
-        await realTimeMap.Geometric.Points.upload(
-         registartions.Select(registration => new RealTimeMap.StreamPoint
-             {
-                 guid = Guid.NewGuid(),
-                 latitude = (double)(registration?.Latitude ?? 0.0),
-                 longitude = (double)(registration?.Longitude ?? 0.0),
-                 value = $"<b>Society Name: </b>{registration.SocietyName}</br><b>Phone Number: </b>{registration.MobileNumber}</br><b>Entity Type: </b>{Helper.GetEnumDisplayName(registration.EntityType)}"
-             }).ToList()
-         );
-    }
-} *@

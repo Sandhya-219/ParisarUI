@@ -135,7 +135,11 @@
     <!--Map-->
     <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm mt-4 hover:shadow-md transition">
         <div class="mt-4 h-[450px] rounded-xl overflow-hidden border border-white/30 shadow-inner">
-            <Map />
+            @if (locations != null)
+            {
+                <Map Locations="locations" IsPm10="isPm10" />
+            }
+            
         </div>
     </div>
 
