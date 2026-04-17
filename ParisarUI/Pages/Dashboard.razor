@@ -1,44 +1,40 @@
 ﻿@page "/dashboard"
 @page "/"
 @using ApexCharts
+@using ParisarUI.DTO
 @using ParisarUI.Dashboard
 @using ParisarUI.Pages.Shared
 @using ParisarUI.Pages
+@inject HttpClient Http
 
-<div class="bg-gray-100 min-h-screen p-4">
-   
-      
+<div class="bg-[oklch(94.3%_0.029_294.588)] min-h-screen p-6">
+
     <!-- 🔷 FILTER SECTION -->
-    <div class="bg-white p-4 rounded-2xl shadow-sm border mb-4">
+    <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm mb-4 hover:shadow-md transition">
         <h2 class="text-sm font-semibold mb-3 text-gray-700">Filters</h2>
 
         <div class="flex flex-wrap gap-3 items-center">
 
             <select @bind="selectedOption" @bind:after="LoadStats"
-                    class="border border-gray-300 p-2 rounded-lg w-48 text-xs shadow-sm">
-                <option value="">Select Location</option>
-                <option value="1">Alandi</option>
-                <option value="2">Bhosari</option>
-                <option value="3">Bhumkar Nagar</option>
-                <option value="4">Hadapsar</option>
-                <option value="5">Dhankawadi</option>
-                <option value="6">MIT-Kothrud</option>
-                <option value="7">Mhada Colony</option>
-                <option value="8">Transport Nagar-Nigdi</option>
-                <option value="9">Panchawati-Pashan</option>
-                <option value="10">Savta Mali Nagar</option>
-                <option value="11">Revenue Colony-Shivaji Nagar</option>
+                    class="border border-gray-200 bg-white/80 p-2 rounded-lg w-48 text-xs shadow-sm focus:ring-2 focus:ring-purple-300 outline-none">
+                @if (locations != null)
+                {
+                    @foreach(var location in locations)
+                    {
+                        <option value="@(location.Id)"> @(location.Name) </option>
+                    }
+                }
             </select>
 
             <InputDate @bind-Value="selectedDate"
-                       class="border border-gray-300 p-2 rounded-lg text-xs shadow-sm" />
+                       class="border border-gray-200 bg-white/80 p-2 rounded-lg text-xs shadow-sm focus:ring-2 focus:ring-purple-300 outline-none" />
 
-            <span class="text-xs">to</span>
+            <span class="text-xs text-gray-500">to</span>
 
             <InputDate @bind-Value="DateToday"
-                       class="border border-gray-300 p-2 rounded-lg text-xs shadow-sm" />
+                       class="border border-gray-200 bg-white/80 p-2 rounded-lg text-xs shadow-sm focus:ring-2 focus:ring-purple-300 outline-none" />
 
-            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg text-xs shadow hover:bg-blue-600 transition">
+            <button class="bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-lg text-xs shadow hover:scale-105 transition">
                 Update
             </button>
         </div>
@@ -50,45 +46,45 @@
             Size="md" />
 
     <!--Select Location Name-->
-    @if (!string.IsNullOrEmpty(selectedLocationName))
+    @if (!string.IsNullOrEmpty(selectedLocationName)) 
     {
         <div class="mb-3">
-            <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-medium">
+            <span class="px-3 py-1 text-xs rounded-full bg-[oklch(93.6%_0.032_17.717)] text-purple-700 font-medium shadow-sm">
                 📍 @selectedLocationName
             </span>
         </div>
     }
+
     <!-- 🔷 STATS -->
     @if (stats != null)
     {
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-
-            <!-- CARD -->
-            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+            
+            <div class="bg-white/70 backdrop-blur-md bg-[oklch(97.9%_0.021_166.113)] p-4 rounded-2xl border border-white/40 shadow-sm text-center hover:-translate-y-1 hover:shadow-md transition">
                 <p class="text-xs text-gray-500">Total Days</p>
-                <h3 class="text-xl font-bold text-blue-600">@stats.TotalDays</h3>
+                <h3 class="text-xl font-bold text-indigo-500">@stats.TotalDays</h3>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+            
+            <div class="bg-white/70 backdrop-blur-md bg-[oklch(95.5%_0.015_12.422)] p-4 rounded-2xl border border-white/40 shadow-sm text-center hover:-translate-y-1 hover:shadow-md transition">
                 <p class="text-xs text-gray-500">Data Available</p>
-                <h3 class="text-xl font-bold text-green-600">
+                <h3 class="text-xl font-bold text-emerald-500">
                     @stats.DataAvailableDays
                 </h3>
                 <p class="text-[10px] text-gray-400">
                     @((stats.TotalDays == 0) ? 0 : (stats.DataAvailableDays * 100) / stats.TotalDays)%
                 </p>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+            
+            <div class="bg-white/70 backdrop-blur-md bg-[oklch(95.1%_0.026_236.824)] p-4 rounded-2xl border border-white/40 shadow-sm text-center hover:-translate-y-1 hover:shadow-md transition">
                 <p class="text-xs text-gray-500">Rank</p>
-                <h3 class="text-xl font-bold text-purple-600">
+                <h3 class="text-xl font-bold text-violet-500">
                     @stats.Rank / @stats.TotalLocations
                 </h3>
             </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+            
+            <div class="bg-white/70 backdrop-blur-md bg-[oklch(97.7%_0.026_102.212)] p-4 rounded-2xl border border-white/40 shadow-sm text-center hover:-translate-y-1 hover:shadow-md transition">
                 <p class="text-xs text-gray-500">Exceed Days</p>
-                <h3 class="text-xl font-bold text-red-500">
+                <h3 class="text-xl font-bold text-rose-400">
                     @stats.ExceedDays
                 </h3>
                 <p class="text-[10px] text-gray-400">@stats.ExceedPercent%</p>
@@ -100,9 +96,8 @@
     <!-- 🔷 CHARTS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        <!-- BAR -->
-        <div class="bg-white p-4 rounded-2xl shadow border">
-            <h2 class="text-sm font-semibold mb-2 text-gray-700">
+        <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm hover:shadow-md transition">
+            <h2 class="text-sm font-semibold mb-2 text-gray-600 tracking-wide">
                 Best vs Worst Areas (@(isPm10 ? "PM10" : "PM2.5"))
             </h2>
 
@@ -115,105 +110,55 @@
             </ApexChart>
         </div>
 
-        <!-- LINE -->
-        <div class="bg-white p-4 rounded-2xl shadow border">
-            <h2 class="text-sm font-semibold mb-2 text-gray-700">
+        <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm hover:shadow-md transition">
+            <h2 class="text-sm font-semibold mb-2 text-gray-600 tracking-wide">
                 Yearly Trends (@(isPm10 ? "PM10" : "PM2.5"))
             </h2>
 
             <ApexChart TItem="DataPoint" Height="250" @key="chartKey">
 
-                <ApexCharts.ApexPointSeries TItem="DataPoint"
-                                            Items="(isPm10 ? Data2024_PM10 : Data2024_PM25)"
-                                            Name="2024"
-                                            SeriesType="SeriesType.Line"
-                                            XValue="e => e.Month"
-                                            YValue="e => e.Value" />
+                @foreach (var year in (isPm10 ? YearlyPM10.Keys : YearlyPM25.Keys))
+                {
+                    <ApexCharts.ApexPointSeries TItem="DataPoint"
+                                                Items="@(isPm10 ? YearlyPM10[year] : YearlyPM25[year])"
+                                                Name="@year.ToString()"
+                                                SeriesType="SeriesType.Line"
+                                                XValue="e => e.Month"
+                                                YValue="e => e.Value" />
+                }
 
-                <ApexCharts.ApexPointSeries TItem="DataPoint"
-                                            Items="(isPm10 ? Data2025_PM10 : Data2025_PM25)"
-                                            Name="2025"
-                                            SeriesType="SeriesType.Line"
-                                            XValue="e => e.Month"
-                                            YValue="e => e.Value" />
-
-                <ApexCharts.ApexPointSeries TItem="DataPoint"
-                                            Items="(isPm10 ? Data2026_PM10 : Data2026_PM25)"
-                                            Name="2026"
-                                            SeriesType="SeriesType.Line"
-                                            XValue="e => e.Month"
-                                            YValue="e => e.Value" />
             </ApexChart>
         </div>
 
     </div>
-    
-<!--Map-->
-<div class="bg-white p-4 rounded-2xl shadow border mt-4">
-     <!-- ✅ MAP INSIDE DIV -->
-        <div class="mt-4 h-[450px] rounded-xl overflow-hidden border shadow-inner relative z-0">
+
+    <!--Map-->
+    <div class="bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/40 shadow-sm mt-4 hover:shadow-md transition">
+        <div class="mt-4 h-[450px] rounded-xl overflow-hidden border border-white/30 shadow-inner">
             <Map />
         </div>
-
-</div>
-
-</div>
-
-@* <!-- 🔷 FLOATING PM TOGGLE (BUBBLE STYLE) -->
-<div class="fixed bottom-6 right-6 z-50">
-
-    <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-xl border hover:shadow-2xl transition">
-
-        <!-- PM2.5 -->
-        <span class="text-xs font-medium @(isPm10 ? "text-gray-400" : "text-black")">
-            PM2.5
-        </span>
-
-        <!-- SWITCH -->
-        <div class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" class="sr-only peer"
-                   @bind="isPm10"
-                   @bind:after="OnToggleChanged" />
-
-            <div class="w-11 h-6 bg-gray-300 rounded-full
-                after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                after:bg-white after:rounded-full after:h-5 after:w-5
-                after:transition-all peer-checked:after:translate-x-5
-                peer-checked:bg-gray-300">
-            </div>
-        </div>
-
-        <!-- PM10 -->
-        <span class="text-xs font-medium @(isPm10 ? "text-blue-600" : "text-gray-400")">
-            PM10
-        </span>
-
     </div>
 
-</div> *@
+</div>
 
-<!-- 🔷 PREMIUM FLOATING TOGGLE (TEAL THEME) -->
+<!-- 🔷 FLOATING TOGGLE -->
 <div class="fixed bottom-10 right-6 z-[9999] group drop-shadow-2xl">
 
-    <!-- TOOLTIP -->
     <div class="absolute bottom-20 right-1/2 translate-x-1/2
         opacity-0 group-hover:opacity-100 transition
-        bg-emerald-600 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
+        bg-purple-500 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
         Switch to @(isPm10 ? "PM2.5" : "PM10")
     </div>
 
-    <!-- BUTTON -->
     <button @onclick="TogglePm"
             class="relative w-20 h-20 rounded-full flex flex-col items-center justify-center
-        shadow-2xl border border-emerald-200
+        shadow-2xl border border-white/30 backdrop-blur-md
         transition-all duration-300
         hover:scale-110 active:scale-95
-        animate-pulse-slow
         @(isPm10
-                                     ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-300/50"
-                                     : "bg-gradient-to-br from-teal-400 to-emerald-600 text-white shadow-teal-300/50")">
+                        ? "bg-gradient-to-br from-violet-400 via-purple-400 to-pink-400 text-white"
+                        : "bg-gradient-to-br from-pink-400 via-purple-400 to-violet-400 text-white")">
 
-        <!-- ICON -->
         <svg xmlns="http://www.w3.org/2000/svg"
              class="w-6 h-6 mb-1 transition-transform duration-300
             @(isPm10 ? "rotate-12 scale-110" : "")"
@@ -223,7 +168,6 @@
                   d="M3 15a4 4 0 014-4h1a5 5 0 0110 1h1a3 3 0 110 6H7a4 4 0 01-4-3z" />
         </svg>
 
-        <!-- TEXT -->
         <span class="text-xs font-bold tracking-wide">
             @(isPm10 ? "PM10" : "PM2.5")
         </span>
@@ -239,15 +183,43 @@
     private bool isPm10 = false;
     private int chartKey = 0;
 
+
     private bool isLoading = true;
+
+    private List<Location> locations = new();
+ 
+
+
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        try
+        {
+            var locationRespone = await Http.GetFromJsonAsync<ApiResponse<Location>>("api/locations");
 
-        await Task.Delay(1500); // simulate API call
+            if (locationRespone != null && locationRespone.Success)
+            {
+                locations = locationRespone.Data ?? new List<Location>();
+            }
+            await Task.WhenAll(
+                        LoadChartData(),
+                        LoadMonthlyTrend()
+                        );
 
-        isLoading = false;
+            //await LoadChartData();
+
+            //await LoadMonthlyTrend(); //line chart
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine("Exception", ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+        
     }
 
     private void OnToggleChanged()
@@ -257,9 +229,12 @@
 
     private string selectedOption = "";
     private string selectedLocationName = "";
-    private DateTime selectedDate = new(2024, 1, 1);
+    private DateTime selectedDate = new(2026, 1, 1);
     private DateTime DateToday = DateTime.Today;
-
+    //yearly code start
+    private Dictionary<int, List<DataPoint>> YearlyPM10 = new();
+    private Dictionary<int, List<DataPoint>> YearlyPM25 = new();
+    //yearly code end
     private LocationStats? stats;
 
     private void LoadStats()
@@ -476,12 +451,12 @@
 
         Colors = new List<string>
     {
-        "#22C55E",
-        "#4ADE80",
-        "#16A34A",
-        "#F59E0B",
-        "#EF4444",
-        "#DC2626"
+        "#4d7c0f",
+        "#65a30d",
+        "#84cc16",
+        "#b91c1c",
+        "#dc2626",
+        "#ef4444",
     },
 
         Xaxis = new ApexCharts.XAxis
@@ -536,106 +511,128 @@
     }
 
     private List<ChartData> barDataPM25 =
-    [
-        new() { Area = "Panchawati-Pashan(Best_1)", Value = 31.09m },
-        new() { Area = "Bhosari(Best_2)", Value = 33.4m },
-        new() { Area = "Transport Nagar-Nigdi(Best_3)", Value = 35.36m },
-        new() { Area = "Hadapsar(Worst_10)", Value = 57.56m },
-        new() { Area = "Bhumkar Nagar(Worst_11)", Value = 58.77m },
-        new() { Area = "MIT-Kothrud(Worst_12)", Value = 61.62m }
+    [        
+        new() { Area = "Bhumkar Nagar" }
+       
     ];
 
     private List<ChartData> barDataPM10 =
     [
-        new() { Area = "Panchawati-Pashan(Best_1)", Value = 69.97m },
-        new() { Area = "Bhosari(Best_2)", Value = 78.59m },
-        new() { Area = "Transport Nagar-Nigdi(Best_3)", Value = 91.71m },
-        new() { Area = "Mhada Colony(Worst_10)", Value = 118.97m },
-        new() { Area = "Bhumkar Nagar(Worst_11)", Value = 123.43m },
-        new() { Area = "Hadapsar(Worst_12)", Value = 134.61m }
+        new() { Area = "Bhumkar Nagar" }
     ];
 
-    private List<DataPoint> Data2024_PM25 =
-    [
-        new() { Month = "Jan", Value = 62.8m },
-        new() { Month = "Feb", Value = 60.6m },
-        new() { Month = "Mar", Value = 51.26m },
-        new() { Month = "Apr", Value = 45.44m },
-        new() { Month = "May", Value = 38.67m },
-        new() { Month = "Jun", Value = 22.72m },
-        new() { Month = "Jul", Value = 17.51m },
-        new() { Month = "Aug", Value = 22.75m },
-        new() { Month = "Sep", Value = 20.79m },
-        new() { Month = "Oct", Value = 33.82m },
-        new() { Month = "Nov", Value = 57.99m },
-        new() { Month = "Dec", Value = 51.29m }
-    ];
+    #region PM2.5 & PM10
+    private async Task LoadMonthlyTrend()
+    {
+        try
+        {
+            var from = selectedDate.ToString("yyyy-MM-dd");
+            var to = DateToday.ToString("yyyy-MM-dd");
 
-    private List<DataPoint> Data2025_PM25 =
-    [
-        new() { Month = "Jan", Value = 60.55m },
-        new() { Month = "Feb", Value = 56.2m },
-        new() { Month = "Mar", Value = 49.66m },
-        new() { Month = "Apr", Value = 38.87m },
-        new() { Month = "May", Value = 29.56m },
-        new() { Month = "Jun", Value = 27.65m },
-        new() { Month = "Jul", Value = 25.12m },
-        new() { Month = "Aug", Value = 24.21m },
-        new() { Month = "Sep", Value = 26.03m },
-        new() { Month = "Oct", Value = 39.7m },
-        new() { Month = "Nov", Value = 60.27m },
-        new() { Month = "Dec", Value = 90.35m }
-    ];
+            var url = $"api/Dashboard/monthlydata?fromDate={from}&toDate={to}";
 
-    private List<DataPoint> Data2026_PM25 =
-    [
-        new() { Month = "Jan", Value = 73.94m },
-        new() { Month = "Feb", Value = 71.2m },
-        new() { Month = "Mar", Value = 47.23m }
-    ];
+            var response = await Http.GetFromJsonAsync<MonthlyTrendResponse>(url);
 
-    private List<DataPoint> Data2024_PM10 =
-    [
-     new() { Month = "Jan", Value = 111.99m },
-     new() { Month = "Feb", Value = 109.28m },
-     new() { Month = "Mar", Value = 95.84m },
-     new() { Month = "Apr", Value = 88.48m },
-     new() { Month = "May", Value = 74.8m },
-     new() { Month = "Jun", Value = 48.06m },
-     new() { Month = "Jul", Value = 49.36m },
-     new() { Month = "Aug", Value = 65.09m },
-     new() { Month = "Sep", Value = 64.57m },
-     new() { Month = "Oct", Value = 81.41m },
-     new() { Month = "Nov", Value = 145.44m },
-     new() { Month = "Dec", Value = 118.83m }
- ];
+            if (response != null && response.Success && response.Data != null)
+            {
+                var grouped = response.Data
+                    .GroupBy(x => x.Year)
+                    .ToList();
 
-    private List<DataPoint> Data2025_PM10 =
-    [
-     new() { Month = "Jan", Value = 132.31m },
-     new() { Month = "Feb", Value = 124.52m },
-     new() { Month = "Mar", Value = 112.42m },
-     new() { Month = "Apr", Value = 97.41m },
-     new() { Month = "May", Value = 67.08m },
-     new() { Month = "Jun", Value = 68.47m },
-     new() { Month = "Jul", Value = 54.9m },
-     new() { Month = "Aug", Value = 59.02m },
-     new() { Month = "Sep", Value = 69.22m },
-     new() { Month = "Oct", Value = 91.53m },
-     new() { Month = "Nov", Value = 141.97m },
-     new() { Month = "Dec", Value = 191.28m }
- ];
+                YearlyPM10.Clear();
+                YearlyPM25.Clear();
 
-    private List<DataPoint> Data2026_PM10 =
-    [
-     new() { Month = "Jan", Value = 154.17m },
-     new() { Month = "Feb", Value = 149.74m },
-     new() { Month = "Mar", Value = 109.7m }
- ];
+                foreach (var yearGroup in grouped)
+                {
+                    YearlyPM10[yearGroup.Key] = yearGroup
+                        .OrderBy(x => x.MonthNumber)
+                        .Select(x => new DataPoint
+                        {
+                            Month = x.Month,
+                            Value = Math.Round(x.PM10, 2)
+                        }).ToList();
+
+                    YearlyPM25[yearGroup.Key] = yearGroup
+                        .OrderBy(x => x.MonthNumber)
+                        .Select(x => new DataPoint
+                        {
+                            Month = x.Month,
+                            Value = Math.Round(x.PM25, 2)
+                        }).ToList();
+                }
+
+                chartKey++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    #endregion
 
     private void TogglePm()
     {
         isPm10 = !isPm10;
         chartKey++; // refresh charts
     }
+
+    #region barchart code
+    private async Task LoadChartData()
+    {
+        try
+        {
+            var from = selectedDate.ToString("yyyy-MM-dd");
+            var to = DateToday.ToString("yyyy-MM-dd");
+
+            var url = $"api/Dashboard?fromDate={from}&toDate={to}";
+
+            var response = await Http.GetFromJsonAsync<BarChartApiResponse<AirQualityChartResponse>>(url);
+
+            if (response != null && response.Success && response.Data != null)
+            {
+                var data = response.Data;
+
+                // PM10
+                barDataPM10 = data.BestPM10
+                    .Select((x, i) => new ChartData
+                    {
+                        Area = $"{x.LocationName}(Best_{i + 1})",
+                        Value = Math.Round(x.PM10,2)
+                    })
+                    .Concat(
+                        data.WorstPM10.Select((x, i) => new ChartData
+                        {
+                            Area = $"{x.LocationName}(Worst_{i + 1})",
+                            Value = Math.Round(x.PM10,2)
+                        })
+                    )
+                    .ToList();
+
+                // PM2.5
+                barDataPM25 = data.BestPM25
+                    .Select((x, i) => new ChartData
+                    {
+                        Area = $"{x.LocationName}(Best_{i + 1})",
+                        Value = Math.Round(x.PM25,2)
+                    })
+                    .Concat(
+                        data.WorstPM25.Select((x, i) => new ChartData
+                        {
+                            Area = $"{x.LocationName}(Worst_{i + 1})",
+                            Value = Math.Round(x.PM25,2)
+                        })
+                    )
+                    .ToList();
+
+                chartKey++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    #endregion
 }
